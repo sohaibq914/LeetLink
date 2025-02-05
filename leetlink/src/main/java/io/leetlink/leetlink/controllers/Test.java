@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api")
-// @CrossOrigin(origins = "http://localhost:3000")  // Allow React app to access this API
 public class Test {
     @GetMapping("/hello")
     public String hello() {
