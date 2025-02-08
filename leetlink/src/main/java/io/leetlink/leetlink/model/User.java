@@ -9,6 +9,13 @@ public class User {
   private int id;
   private String username;
   private String password;
+  private String email;
+
+  public User(String name, String email, String password) {
+    this.username = username;
+    this.password = password;
+    this.email = email;
+  }
 
   public int getId() {
     return id;
@@ -32,6 +39,11 @@ public class User {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public String getEmail() {
+    return email;
+
   }
 
   @Override

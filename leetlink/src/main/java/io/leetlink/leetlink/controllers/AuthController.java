@@ -1,8 +1,5 @@
 package io.leetlink.leetlink.controllers;
 
-import io.leetlink.leetlink.config.JwtUtil;
-import io.leetlink.leetlink.model.AuthRequest;
-import io.leetlink.leetlink.model.RegisterAuth;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,23 +7,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.e_cmmerce.demo.repo.cartRepo;
-
-import com.e_cmmerce.demo.repo.userRepo;
+import io.leetlink.leetlink.config.JwtUtil;
+import io.leetlink.leetlink.model.AuthRequest;
+import io.leetlink.leetlink.model.RegisterAuth;
+import io.leetlink.leetlink.model.User;
+import io.leetlink.leetlink.repo.UserRepo;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173") // Allow only your frontend's URL
+@CrossOrigin // Allow only your frontend's URL
 public class AuthController {
 
-  private final userRepo userRepo;
+  private final UserRepo userRepo;
   private final PasswordEncoder passwordEncoder;
-  private final cartRepo cartRepo;
   private final JwtUtil jwtUtil;
 
-  public AuthController(userRepo userRepository, PasswordEncoder passwordEncoder, cartRepo cartRepo, JwtUtil jwtUtil) {
+  public AuthController(UserRepo userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
     this.userRepo = userRepository;
     this.passwordEncoder = passwordEncoder;
-    this.cartRepo = cartRepo;
+
     this.jwtUtil = jwtUtil;
   }
 
@@ -40,8 +38,7 @@ public class AuthController {
       return ResponseEntity.status(409).build();
     }
 
-    userRepo.save(new user(name, email, passwordEncoder.encode(password)));
-    cartRepo.save(new cart(userRepo.findByEmail(email).getId()));
+    userRepo.save(new User(name, email, passwordEncoder.encode(password)));
     return ResponseEntity.ok(jwtUtil.generateToken(userRepo.findByEmail(email).getEmail()));
 
   }
@@ -54,7 +51,7 @@ public class AuthController {
 
     if (userRepo.findByEmail(email) != null) {
 
-      user loginUser = userRepo.findByEmail(email);
+      User loginUser = userRepo.findByEmail(email);
 
       boolean login_status = passwordEncoder.matches(password, loginUser.getPassword());
 

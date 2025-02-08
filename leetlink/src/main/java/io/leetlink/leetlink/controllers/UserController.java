@@ -1,20 +1,19 @@
 package io.leetlink.leetlink.controllers;
 
-import io.leetlink.leetlink.model.User;
-import io.leetlink.leetlink.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import io.leetlink.leetlink.model.User;
 import io.leetlink.leetlink.service.TokenService;
-import java.util.Map;
-import java.util.HashMap;
+import io.leetlink.leetlink.service.UserService;
 
 @RestController
-@RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class UserController {
 
   @Autowired
@@ -26,38 +25,6 @@ public class UserController {
   public UserController(TokenService tokenService, UserService userService) {
     this.tokenService = tokenService;
     this.userService = userService;
-  }
-
-  @PostMapping("/register")
-  public ResponseEntity<?> register(@RequestBody User user) {
-    try {
-      User registeredUser = userService.register(user);
-      String token = tokenService.generateToken(registeredUser);
-
-      Map<String, Object> response = new HashMap<>();
-      response.put("token", token);
-      response.put("user", registeredUser);
-
-      return ResponseEntity.ok(response);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
-    }
-  }
-
-  @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestBody User user) {
-    try {
-      String token = userService.verify(user);
-      User authenticatedUser = userService.getUserByEmail(user.getEmail());
-
-      Map<String, Object> response = new HashMap<>();
-      response.put("token", token);
-      response.put("user", authenticatedUser);
-
-      return ResponseEntity.ok(response);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
-    }
   }
 
   @GetMapping("/current-user")
