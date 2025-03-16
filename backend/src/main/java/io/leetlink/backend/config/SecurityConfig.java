@@ -15,48 +15,51 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 // import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration // signals to spring that this is a config class
 @EnableWebSecurity // allows custom security config
 public class SecurityConfig {
 
-      @Autowired
-      private UserDetailsService userDetailsService;
+  @Autowired
+  private UserDetailsService userDetailsService;
 
+  @Autowired
+  private JwtFilter jwtFilter;
 
-    
-      @Bean
-      public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        
-        return http
-        .csrf(customizer -> customizer.disable()) // don't have to send csrf token in header with post, put, and delete requests
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+    return http
+        .csrf(customizer -> customizer.disable()) // don't have to send csrf token in header with post, put, and delete
+                                                  // requests
         .authorizeHttpRequests(request -> request
-          .requestMatchers("/register/**", "/login/**") 
-          .permitAll() // permit all the request matchers
-          .anyRequest().authenticated())
+            .requestMatchers("/register/**", "/login/**")
+            .permitAll() // permit all the request matchers
+            .anyRequest().authenticated())
         .httpBasic(Customizer.withDefaults()) // login for postman
         // generates new session each reqeust so no need for csrf token
-        .sessionManagement(session -> 
-        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
-      }
+  }
 
-      // before, it was using its own authentication provider
-      // now, it is using our own authentication provider which is DaoAuthenticationProvider
-      @Bean
-      public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); // will convert password into bcrypt hash and will verify password from db
-        provider.setUserDetailsService(userDetailsService); // using our own userDetailsService (we override a method, check MyUsersDetailsService)
-        return provider;
-      }
+  // before, it was using its own authentication provider
+  // now, it is using our own authentication provider which is
+  // DaoAuthenticationProvider
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); // will convert password into bcrypt hash and will
+                                                                // verify password from db
+    provider.setUserDetailsService(userDetailsService); // using our own userDetailsService (we override a method, check
+                                                        // MyUsersDetailsService)
+    return provider;
+  }
 
-
-      // will talk to authentication provider
-      @Bean
-      public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-      }
+  // will talk to authentication provider
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
 }
-

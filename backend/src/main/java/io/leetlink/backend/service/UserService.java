@@ -13,7 +13,6 @@ import io.leetlink.backend.repo.UserRepo;
 @Service
 public class UserService {
 
-
   @Autowired // auto injects the bean
   private UserRepo repo;
 
@@ -25,30 +24,19 @@ public class UserService {
 
   private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-
   public Users register(Users user) {
     user.setPassword(encoder.encode(user.getPassword()));
     return repo.save(user);
   }
 
-
   public String verify(Users user) {
-    try {
-      Authentication authentication = 
-          authManager.authenticate(new UsernamePasswordAuthenticationToken(
-              user.getUsername(), 
-              user.getPassword()
-          ));
+    Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(
+        user.getUsername(),
+        user.getPassword()));
 
-      if (authentication.isAuthenticated()) {
-          return "Success";
-      }
-      return "Fail";
-  } catch (Exception e) {
-      // Log the exception
-      System.out.println("Authentication error: " + e.getMessage());
-      return "Fail: " + e.getMessage();
+    if (authentication.isAuthenticated()) {
+      return jwtService.generateToken(user.getUsername());
+    }
+    return "Fail";
   }
-}
-  
 }
