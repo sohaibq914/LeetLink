@@ -34,9 +34,9 @@ public class JWTService {
     }
   }
 
-  // generate a token for a given username
+  // generate a token for a given email
   // username as subejct, issued time as current time, expiration time as 30 mins
-  public String generateToken(String username) {
+  public String generateToken(String email) {
 
     Map<String, Object> claims = new HashMap<>();
 
@@ -44,7 +44,7 @@ public class JWTService {
     return Jwts.builder()
         .claims()
         .add(claims)
-        .subject(username)
+        .subject(email) // ! this will be the email
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() * 60 * 60 * 30))
         .and()
@@ -58,7 +58,7 @@ public class JWTService {
   }
 
   public String extractUserName(String token) {
-    // extract the username from jwt token
+    // extract the email from jwt token
     return extractClaim(token, Claims::getSubject);
   }
 
@@ -76,8 +76,8 @@ public class JWTService {
   }
 
   public boolean validateToken(String token, UserDetails userDetails) {
-    final String userName = extractUserName(token);
-    return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    final String email = extractUserName(token);
+    return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
   }
 
   private boolean isTokenExpired(String token) {

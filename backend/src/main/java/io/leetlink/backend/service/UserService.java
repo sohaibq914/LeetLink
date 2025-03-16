@@ -14,7 +14,7 @@ import io.leetlink.backend.repo.UserRepo;
 public class UserService {
 
   @Autowired // auto injects the bean
-  private UserRepo repo;
+  private UserRepo userRepo;
 
   @Autowired
   private JWTService jwtService;
@@ -25,17 +25,23 @@ public class UserService {
   private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
   public Users register(Users user) {
+
+    // Check if user already exists
+    if (userRepo.findByEmail(user.getEmail()) != null) {
+      throw new RuntimeException("User with this email already exists");
+    }
+
     user.setPassword(encoder.encode(user.getPassword()));
-    return repo.save(user);
+    return userRepo.save(user);
   }
 
   public String verify(Users user) {
     Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(
-        user.getUsername(),
+        user.getEmail(),
         user.getPassword()));
 
     if (authentication.isAuthenticated()) {
-      return jwtService.generateToken(user.getUsername());
+      return jwtService.generateToken(user.getEmail());
     }
     return "Fail";
   }

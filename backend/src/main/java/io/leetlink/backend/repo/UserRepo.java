@@ -6,8 +6,10 @@ import org.springframework.stereotype.Repository;
 import io.leetlink.backend.model.Users;
 
 @Repository
-public interface UserRepo extends JpaRepository<Users, Integer> { // Users is the table, Integer is the PK type
+public interface UserRepo extends JpaRepository<Users, String> { // Users is the table, String is the PK type
   // custom query method to find user by username
-  Users findByUsername(String username);
+  // Users findByUsername(String username);
+
+  Users findByEmail(String email);
 
 }

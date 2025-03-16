@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserPrincipal implements UserDetails{
+public class UserPrincipal implements UserDetails {
 
   private Users user;
 
@@ -21,7 +21,8 @@ public class UserPrincipal implements UserDetails{
   }
 
   // q: isn't getPassword and getUsername already in model?
-  // a: yes, but this is for spring to check if username and password is valid during auth process
+  // a: yes, but this is for spring to check if username and password is valid
+  // during auth process
   @Override
   public String getPassword() {
     return user.getPassword();
@@ -29,7 +30,29 @@ public class UserPrincipal implements UserDetails{
 
   @Override
   public String getUsername() {
-    return user.getUsername();
+    // return email as the username for spring security
+    return user.getEmail();
   }
-  
+
+  // add these required methods with default implementations for interface
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
+
 }

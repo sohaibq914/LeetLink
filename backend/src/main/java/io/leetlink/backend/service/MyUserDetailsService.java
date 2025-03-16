@@ -14,17 +14,17 @@ import io.leetlink.backend.repo.UserRepo;
 public class MyUserDetailsService implements UserDetailsService {
 
   @Autowired
-  private UserRepo repo;
+  private UserRepo userRepo;
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Users user = repo.findByUsername(username);
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    Users user = userRepo.findByEmail(email);
     if (user == null) {
       System.out.println("User Not Found");
-      throw new UsernameNotFoundException("user not found");
+      throw new UsernameNotFoundException("User not found with email: " + email);
     }
 
     return new UserPrincipal(user);
   }
-  
+
 }
