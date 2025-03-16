@@ -1,0 +1,62 @@
+package io.leetlink.backend.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+
+
+@Configuration // signals to spring that this is a config class
+@EnableWebSecurity // allows custom security config
+public class SecurityConfig {
+
+      @Autowired
+      private UserDetailsService userDetailsService;
+
+
+    
+      @Bean
+      public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        
+        return http
+        .csrf(customizer -> customizer.disable()) // don't have to send csrf token in header with post, put, and delete requests
+        .authorizeHttpRequests(request -> request
+          .requestMatchers("/register/**", "/login/**") 
+          .permitAll() // permit all the request matchers
+          .anyRequest().authenticated())
+        .httpBasic(Customizer.withDefaults()) // login for postman
+        // generates new session each reqeust so no need for csrf token
+        .sessionManagement(session -> 
+        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .build();
+      }
+
+      // before, it was using its own authentication provider
+      // now, it is using our own authentication provider which is DaoAuthenticationProvider
+      @Bean
+      public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); // will convert password into bcrypt hash and will verify password from db
+        provider.setUserDetailsService(userDetailsService); // using our own userDetailsService (we override a method, check MyUsersDetailsService)
+        return provider;
+      }
+
+
+      // will talk to authentication provider
+      @Bean
+      public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+      }
+}
+
