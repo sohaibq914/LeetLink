@@ -36,17 +36,18 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     return http
-        .csrf(customizer -> customizer.disable()) // don't have to send csrf token in header with post, put, and delete
-                                                  // requests
+        .cors() // Enable CORS using the CorsConfigurationSource bean
+        .and()
+        .csrf(customizer -> customizer.disable()) // Disable CSRF protection for APIs
         .authorizeHttpRequests(request -> request
-            .requestMatchers("/register/**", "/login/**")
-            .permitAll() // permit all the request matchers
+            .requestMatchers("/register/**", "/login/**", "/api/problems/**", "/report/**")
+            .permitAll()
             .anyRequest().authenticated())
-        .httpBasic(Customizer.withDefaults()) // login for postman
-        // generates new session each reqeust so no need for csrf token
+        .httpBasic(Customizer.withDefaults()) // Enables basic auth for tools like Postman
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
+
   }
 
   // before, it was using its own authentication provider
@@ -68,13 +69,13 @@ public class SecurityConfig {
     return config.getAuthenticationManager();
   }
 
-  // Add this bean to configure CORS
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // Your React app's URL
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+    configuration.setExposedHeaders(Arrays.asList("Authorization"));
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

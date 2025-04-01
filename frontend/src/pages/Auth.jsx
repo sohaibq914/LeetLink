@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Auth.css";
 
-const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const Auth = ({ defaultIsLogin = true }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isLogin, setIsLogin] = useState(defaultIsLogin);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -11,6 +14,11 @@ const Auth = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState(null);
+
+  // Update isLogin state when route changes
+  useEffect(() => {
+    setIsLogin(location.pathname === "/login");
+  }, [location.pathname]);
 
   const API_BASE_URL = "http://localhost:8080"; // Change this to your Spring Boot backend URL
 
@@ -86,11 +94,14 @@ const Auth = () => {
           localStorage.setItem("email", data.email);
           setMessage({ type: "success", text: "Login successful!" });
 
-          // Redirect or update app state
-          window.location.href = "/dashboard"; // Or use React Router
+          // Redirect to dashboard
+          navigate("/dashboard");
         } else {
           setMessage({ type: "success", text: "Registration successful! You can now log in." });
-          setIsLogin(true);
+          // Redirect to login page after successful registration
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
         }
 
         // Reset form after successful submission
@@ -108,7 +119,9 @@ const Auth = () => {
   };
 
   const toggleMode = () => {
-    setIsLogin(!isLogin);
+    const newMode = !isLogin;
+    setIsLogin(newMode);
+    navigate(newMode ? "/login" : "/register");
     setErrors({});
     setMessage(null);
   };
