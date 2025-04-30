@@ -14,7 +14,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/problems")
-@CrossOrigin(origins = "http://localhost:5173") // For Vite dev server
+@CrossOrigin(origins = {
+    "http://localhost:5173",
+    "https://leetlink-frontend.vercel.app" // ← your Vercel frontend URL
+})
 public class ProblemController {
 
   @Autowired

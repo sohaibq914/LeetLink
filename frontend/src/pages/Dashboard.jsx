@@ -35,7 +35,7 @@ const Dashboard = () => {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/api/problems", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -86,7 +86,7 @@ const Dashboard = () => {
     if (!window.confirm("Are you sure you want to delete this problem?")) return;
 
     try {
-      await fetch(`http://localhost:8080/api/problems/${problemId}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/problems/${problemId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -101,7 +101,7 @@ const Dashboard = () => {
 
   const fetchReportProblems = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/report/problems?email=${email}&difficulty=${reportDifficulty}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/report/problems?email=${email}&difficulty=${reportDifficulty}`);
       if (!response.ok) throw new Error("Failed to fetch report data");
       const data = await response.json();
       setReportResults(data);
@@ -183,7 +183,7 @@ const Dashboard = () => {
       if (editingProblem) {
         // Update existing problem
         // In a real app, this would be an API call:
-        await fetch(`http://localhost:8080/api/problems/${editingProblem}`, {
+        await fetch(`${import.meta.env.VITE_API_URL}/api/problems/${editingProblem}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -197,7 +197,7 @@ const Dashboard = () => {
       } else {
         // Add new problem
         // In a real app, this would be an API call:
-        const response = await fetch("http://localhost:8080/api/problems", {
+        const response = await fetch("${import.meta.env.VITE_API_URL}/api/problems", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
