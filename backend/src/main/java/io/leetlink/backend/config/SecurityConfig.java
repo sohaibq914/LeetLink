@@ -73,7 +73,10 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5174"));
+    configuration.setAllowedOrigins(Arrays.asList(
+        "http://localhost:5173", // Vite dev
+        "https://leetlink-dmwa2f3ps-sohaibs-projects-c1e3784b.vercel.app", // your Vercel frontend
+        "https://leetlink-theta.vercel.app/"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
     configuration.setExposedHeaders(Arrays.asList("Authorization"));
