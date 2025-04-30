@@ -16,7 +16,7 @@ public class CorsConfig {
         registry.addMapping("/**")
             .allowedOrigins(
                 "http://localhost:5173",
-                "https://leetlink-frontend.vercel.app")
+                "https://leetlink-cfl5.onrender.com")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true);
