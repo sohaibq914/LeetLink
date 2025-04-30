@@ -3,6 +3,8 @@ import ProblemTable from "../components/ProblemTable";
 import FetchLC from "../components/FetchLC";
 import "./Dashboard.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const Dashboard = () => {
   const email = localStorage.getItem("email");
   const [problems, setProblems] = useState([]);
@@ -20,22 +22,19 @@ const Dashboard = () => {
   const [reportDifficulty, setReportDifficulty] = useState("Easy");
   const [reportResults, setReportResults] = useState([]);
 
-  // Sample topics for dropdown
   const topicOptions = ["Arrays", "Strings", "Linked List", "Stacks", "Queues", "Trees", "Graphs", "Heap", "Hash Table", "Dynamic Programming", "Greedy", "Binary Search", "Recursion", "Bit Manipulation", "Math"];
 
-  // Fetch data from the backend API
   useEffect(() => {
     const fetchProblems = async () => {
       setIsLoading(true);
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          // Redirect to login if no token is found
           window.location.href = "/login";
           return;
         }
 
-        const response = await fetch(`${import.meta.env.VITE_API_URL}`, {
+        const response = await fetch(`${API_URL}/api/problems`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -43,31 +42,19 @@ const Dashboard = () => {
 
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
-            // Handle unauthorized/forbidden
             localStorage.removeItem("token");
             localStorage.removeItem("email");
             window.location.href = "/login";
             return;
           }
-          throw new Error("Failed to fetch problems");
+          const errorText = await response.text();
+          throw new Error(errorText);
         }
 
         const data = await response.json();
         setProblems(data);
       } catch (error) {
         console.error("Error fetching problems:", error);
-        // Use sample data as fallback for development
-        const sampleProblems = [
-          { id: 1, name: "Two Sum", topic: "Arrays", difficulty: "Easy", solveTimeMinutes: 15, notes: "Use a hash map to store values and their indices" },
-          { id: 2, name: "Add Two Numbers", topic: "Linked List", difficulty: "Medium", solveTimeMinutes: 25, notes: "Create dummy node to handle edge cases" },
-          { id: 3, name: "Longest Substring Without Repeating Characters", topic: "Strings", difficulty: "Medium", solveTimeMinutes: 20, notes: "Sliding window with a hash set" },
-          { id: 4, name: "Median of Two Sorted Arrays", topic: "Binary Search", difficulty: "Hard", solveTimeMinutes: 45, notes: "Find the correct partition point" },
-          { id: 5, name: "Longest Palindromic Substring", topic: "Strings", difficulty: "Medium", solveTimeMinutes: 30, notes: "Expand around center approach" },
-          { id: 6, name: "Valid Parentheses", topic: "Stacks", difficulty: "Easy", solveTimeMinutes: 10, notes: "Use a stack to track opening brackets" },
-          { id: 7, name: "Merge K Sorted Lists", topic: "Heap", difficulty: "Hard", solveTimeMinutes: 35, notes: "Use a min heap to efficiently merge" },
-          { id: 8, name: "Trapping Rain Water", topic: "Arrays", difficulty: "Hard", solveTimeMinutes: 40, notes: "Calculate left and right max heights" },
-        ];
-        setProblems(sampleProblems);
       } finally {
         setIsLoading(false);
       }
@@ -84,9 +71,8 @@ const Dashboard = () => {
 
   const handleDeleteProblem = async (problemId) => {
     if (!window.confirm("Are you sure you want to delete this problem?")) return;
-
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/problems/${problemId}`, {
+      await fetch(`${API_URL}/api/problems/${problemId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -101,13 +87,13 @@ const Dashboard = () => {
 
   const fetchReportProblems = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/report/problems?email=${email}&difficulty=${reportDifficulty}`);
+      const response = await fetch(`${API_URL}/report/problems?email=${email}&difficulty=${reportDifficulty}`);
       if (!response.ok) throw new Error("Failed to fetch report data");
       const data = await response.json();
       setReportResults(data);
     } catch (error) {
       console.error("Error fetching report data:", error);
-      setReportResults([]); // clear results if failed
+      setReportResults([]);
     }
   };
 
@@ -127,7 +113,6 @@ const Dashboard = () => {
   };
 
   const handleAddProblem = () => {
-    // Reset form when adding new problem
     setFormData({
       name: "",
       topic: "",
@@ -147,7 +132,6 @@ const Dashboard = () => {
       [name]: value,
     });
 
-    // Clear error when field is edited
     if (formErrors[name]) {
       setFormErrors({
         ...formErrors,
@@ -181,9 +165,7 @@ const Dashboard = () => {
 
     try {
       if (editingProblem) {
-        // Update existing problem
-        // In a real app, this would be an API call:
-        await fetch(`${import.meta.env.VITE_API_URL}/api/problems/${editingProblem}`, {
+        await fetch(`${API_URL}/api/problems/${editingProblem}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -192,12 +174,9 @@ const Dashboard = () => {
           body: JSON.stringify(problemData),
         });
 
-        // For demo purposes, update locally:
         setProblems(problems.map((problem) => (problem.id === editingProblem ? { ...problem, ...problemData } : problem)));
       } else {
-        // Add new problem
-        // In a real app, this would be an API call:
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/problems`, {
+        const response = await fetch(`${API_URL}/api/problems`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -205,15 +184,12 @@ const Dashboard = () => {
           },
           body: JSON.stringify(problemData),
         });
-        const data = await response.json();
-        console.log(data);
 
-        // For demo purposes, add locally with a new ID:
+        const data = await response.json();
         const newId = Math.max(...problems.map((p) => p.id), 0) + 1;
         setProblems([...problems, { id: newId, ...problemData }]);
       }
 
-      // Close the form after successful submission
       setShowAddForm(false);
     } catch (error) {
       console.error("Error saving problem:", error);
@@ -258,6 +234,7 @@ const Dashboard = () => {
           ) : (
             <p>No report data yet. Try selecting a difficulty and fetching.</p>
           )}
+
           <div className="section-header">
             <h2>My Practice Problems</h2>
             <button className="add-problem-btn" onClick={handleAddProblem}>
