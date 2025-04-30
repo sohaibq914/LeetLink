@@ -54,7 +54,6 @@ const router = createBrowserRouter([
   // Protected routes
   {
     path: "/",
-    element: <ProtectedRoute />, // requires token
     children: [
       {
         index: true, // this is the same as path: "/"
