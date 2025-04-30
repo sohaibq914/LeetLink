@@ -41,10 +41,7 @@ const AuthPage = ({ isLogin }) => {
 
 // Create router
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Navigate to="/dashboard" replace />,
-  },
+  // Public routes
   {
     path: "/login",
     element: <AuthPage isLogin={true} />,
@@ -53,20 +50,28 @@ const router = createBrowserRouter([
     path: "/register",
     element: <AuthPage isLogin={false} />,
   },
+
+  // Protected routes
   {
     path: "/",
-    element: <ProtectedRoute />,
+    element: <ProtectedRoute />, // requires token
     children: [
+      {
+        index: true, // this is the same as path: "/"
+        element: <Navigate to="/dashboard" replace />,
+      },
       {
         path: "dashboard",
         element: <Dashboard />,
       },
       {
         path: "profile",
-        element: <div>Profile Page</div>, // Replace with your Profile component
+        element: <div>Profile Page</div>,
       },
     ],
   },
+
+  // Catch-all for 404
   {
     path: "*",
     element: <NotFound />,
