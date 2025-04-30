@@ -197,7 +197,7 @@ const Dashboard = () => {
       } else {
         // Add new problem
         // In a real app, this would be an API call:
-        const response = await fetch("${import.meta.env.VITE_API_URL}/api/problems", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/problems`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
