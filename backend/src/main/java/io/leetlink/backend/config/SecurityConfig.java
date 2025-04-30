@@ -36,13 +36,14 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
     return http
+        .csrf().disable()
         .cors() // Enable CORS using the CorsConfigurationSource bean
         .and()
         .csrf(customizer -> customizer.disable()) // Disable CSRF protection for APIs
         .authorizeHttpRequests(request -> request
             .requestMatchers("/register/**", "/login/**", "/api/problems/**", "/report/**")
             .permitAll()
-            .anyRequest().authenticated())
+            .anyRequest().permitAll())
         .httpBasic(Customizer.withDefaults()) // Enables basic auth for tools like Postman
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
