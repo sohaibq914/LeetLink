@@ -20,7 +20,7 @@ const Auth = ({ defaultIsLogin = true }) => {
     setIsLogin(location.pathname === "/login");
   }, [location.pathname]);
 
-  const API_BASE_URL = "http://localhost:8080"; // Change this to your Spring Boot backend URL
+  const API_BASE_URL = "https://leetlink-theta.vercel.app"; // Change this to your Spring Boot backend URL
 
   const handleChange = (e) => {
     const { name, value } = e.target;
