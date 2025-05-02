@@ -76,7 +76,8 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(Arrays.asList(
         "http://localhost:5173", // Vite dev
         "https://leetlink-dmwa2f3ps-sohaibs-projects-c1e3784b.vercel.app", // your Vercel frontend
-        "https://leetlink-theta.vercel.app/"));
+        "https://leetlink-theta.vercel.app/",
+        "https://leetlink-theta.vercel.app/dashboard"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
     configuration.setExposedHeaders(Arrays.asList("Authorization"));
